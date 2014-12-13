@@ -26,73 +26,20 @@ func (r *Instance) SetSecret(secret string) {
 	r.secret = secret
 }
 
-//	Deal count
-//	http://docs.yacuna.com/api/#api-Deal-Deal_count
-type DealCountRequest struct {
-
-	WalletAccountId		string			`json:"walletAccountId"`
-	MarketId 			string			`json:"marketId"`
-	OrderId 			string			`json:"orderId"`
-	TradeDealType 		string			`json:"tradeDealType"`
-	TradeDealStatus 	string			`json:"tradeDealStatus"`
-	FromDate 			string			`json:"fromDate"`
-	UntilDate 			string			`json:"untilDate"`
-
-}
-
-type DealCountResponse struct {
-
-}
-
-//	Get Wallet
-//	http://docs.yacuna.com/api/#api-Wallet-Wallet_get
-type GetWalletRequest struct {
-	Currency			string			`json:"currency"`
-}
-
-type GetWalletResponse struct {
-	RequestId			string			`json:"requestId"`
-	Status				string			`json:"status"`
-	Wallet				Wallet			`json:"wallet"`
-}
-
-type Wallet struct {
-	WalletId			string			`json:"walletId"`
-	WalletStatus 		string			`json:"walletStatus"`
-	Accounts			[]WalletAccount	`json:"accounts"`
-}
-
-type WalletAccount struct {
-	WalletAccountId 	string			`json:"walletAccountId"`
-	Currency 			string			`json:"currency"`
-	AccountType 		string			`json:"accountType"`
-	AccountStatus		string			`json:"accountStatus"`
-	AccountName			string			`json:"accountName"`
-	AccountBalance		AccountBalance	`json:"accountBalance"`
-}
-
-type AccountBalance struct {
-	Balance 			Money			`json:"balance"`
-	ReservedBalance		Money			`json:"reservedBalance"`
-	InOrders			Money			`json:"inOrders"`
-}
-
-type Money struct {
-	Currency			string			`json:"currency"`
-	Amount 				float64			`json:"amount"`
-}
-
 var ErrUnexpectedType = errors.New("unexpected type in response")
 var ErrClientError = errors.New("client error (4xx)")
 var ErrServerError = errors.New("server error (5xx)")
 
 
+//	Deal Count
+//	http://docs.yacuna.com/api/#api-Deal-Deal_count
 func (r *Instance) GetDealCount(req *DealCountRequest) (*DealCountResponse, error) {
 
+	uriPath := "deal/count"
 	respObj := &DealCountResponse{}
-	res := r.api.Res("deal/count", respObj)
+	res := r.api.Res(uriPath, respObj)
 
-	r.setAuthentication(res, "deal/count")
+	r.setAuthentication(res, uriPath)
 	re, err := doGet(res, req)
 	if err != nil {
 		return nil, err
@@ -107,12 +54,61 @@ func (r *Instance) GetDealCount(req *DealCountRequest) (*DealCountResponse, erro
 
 }
 
+// Deal Get
+// http://docs.yacuna.com/api/#api-Deal-Deal_get
+func (r *Instance) GetDeal(dealId string) (*GetDealResponse, error) {
+
+	uriPath := "deal/get/" + dealId
+	respObj := &GetDealResponse{}
+	res := r.api.Res(uriPath, respObj)
+
+	r.setAuthentication(res, uriPath)
+	re, err := doGet(res)
+	if err != nil {
+		return nil, err
+	}
+
+	ret, ok := re.Response.(GetDealResponse)
+	if !ok {
+		return nil, ErrUnexpectedType
+	}
+
+	return &ret, nil
+
+}
+
+//	Deal List
+//	http://docs.yacuna.com/api/#api-Deal-Deal_list
+func (r *Instance) GetDealList(req *DealListRequest) (*DealListResponse, error) {
+
+	uriPath := "deal/list"
+	respObj := &DealListResponse{}
+	res := r.api.Res(uriPath, respObj)
+
+	r.setAuthentication(res, uriPath)
+	re, err := doGet(res, req)
+	if err != nil {
+		return nil, err
+	}
+
+	ret, ok := re.Response.(DealListResponse)
+	if !ok {
+		return nil, ErrUnexpectedType
+	}
+
+	return &ret, nil
+
+}
+
+//	Get Wallet
+//	http://docs.yacuna.com/api/#api-Wallet-Wallet_get
 func (r *Instance) GetWallet(req *GetWalletRequest) (*GetWalletResponse, error) {
 
+	uriPath := "wallet/get"
 	respObj := &GetWalletResponse{}
-	res := r.api.Res("wallet/get", respObj)
+	res := r.api.Res(uriPath, respObj)
 
-	r.setAuthentication(res, "wallet/get")
+	r.setAuthentication(res, uriPath)
 	re, err := doGet(res, req)
 	if err != nil {
 		return nil, err
@@ -127,18 +123,26 @@ func (r *Instance) GetWallet(req *GetWalletRequest) (*GetWalletResponse, error) 
 
 }
 
-func doGet(res *gopencils.Resource, req interface{}) (*gopencils.Resource, error) {
+func doGet(res *gopencils.Resource, req ...interface{}) (*gopencils.Resource, error) {
 
-	re, err := res.Get( *toStringMap(req) )
+	var re *gopencils.Resource
+	var err error
+	if len(req) > 0 {
+		re, err = res.Get(*toStringMap(req[0]))
+	} else {
+		re, err = res.Get()
+	}
+
 	if err != nil {
 		return nil, err
 	}
+
 
 	if re.Raw.StatusCode >= 500 {
 		return nil, ErrServerError
 	}
 	if re.Raw.StatusCode >= 400 {
-		return nil, ErrClientError
+		return re, ErrClientError
 	}
 
 	return re, err
