@@ -89,26 +89,26 @@ type DealListResponse struct {
 type TradeDealType string
 
 const (
-	TDT_Buy  string = "Buy"
-	TDT_Sell string = "Sell"
+	TDT_Buy  TradeDealType = "Buy"
+	TDT_Sell TradeDealType = "Sell"
 )
 
 type TradeDealSubtype string
 
 const (
-	TDS_MarketTaker string = "MarketTaker"
-	TDS_MarketMaker string = "MarketMaker"
+	TDS_MarketTaker TradeDealSubtype = "MarketTaker"
+	TDS_MarketMaker TradeDealSubtype = "MarketMaker"
 )
 
 type TradeStatus string
 
 const (
-	TS_Created   string = "Created"   // Created, but not yet active
-	TS_Confirmed string = "Comfirmed" // Confirmed, to or in order-book
-	TS_Completed string = "Completed" // Order has been completely executed in at least 1 TradeDeal
-	TS_Cancelled string = "Cancelled" // Order has been cancelled
-	TS_Expired   string = "Expired"   // Order has been expired - typically after 1 day without being confirmed
-	TS_Rejected  string = "Rejected"  // Order has been rejected by the market
+	TS_Created   TradeStatus = "Created"   // Created, but not yet active
+	TS_Confirmed TradeStatus = "Comfirmed" // Confirmed, to or in order-book
+	TS_Completed TradeStatus = "Completed" // Order has been completely executed in at least 1 TradeDeal
+	TS_Cancelled TradeStatus = "Cancelled" // Order has been cancelled
+	TS_Expired   TradeStatus = "Expired"   // Order has been expired - typically after 1 day without being confirmed
+	TS_Rejected  TradeStatus = "Rejected"  // Order has been rejected by the market
 )
 
 type TradeCommon struct {
@@ -204,23 +204,23 @@ type OrderResponse struct {
 type TradeOrderType string
 
 const (
-	TOT_BuyMarket  string = "BuyMarket"  // Buy at best market price
-	TOT_BuyLimit   string = "BuyLimit"   // Buy at defined price or better
-	TOT_SellMarket string = "SellMarket" // Sell at best market price
-	TOT_SellLimit  string = "SellLimit"  // Sell at defined price or better
+	TOT_BuyMarket  TradeOrderType = "BuyMarket"  // Buy at best market price
+	TOT_BuyLimit   TradeOrderType = "BuyLimit"   // Buy at defined price or better
+	TOT_SellMarket TradeOrderType = "SellMarket" // Sell at best market price
+	TOT_SellLimit  TradeOrderType = "SellLimit"  // Sell at defined price or better
 )
 
 type TradeOrderMarketStatus string
 
 const (
-	TOMS_PendingSendToMarket        string = "PendingSendToMarket"        // Order is to be sent to the market
-	TOMS_SentToMarket               string = "SentToMarket"               // Order has been sent to the market
-	TOMS_InOrderBook                string = "InOrderBook"                // Order has been received by the market, and placed into the order-book
-	TOMS_Completed                  string = "Completed"                  // Order has been completely executed, and removed from the order-book
-	TOMS_PendingCancellationRequest string = "PendingCancellationRequest" // Cancellation request is to be sent to the market
-	TOMS_CancellationRequested      string = "CancellationRequested"      // Cancellation request has been sent to the market
-	TOMS_Cancelled                  string = "Cancelled"                  // Order has been cancelled in the market, and removed from the order-book - though may still have been partially executed
-	TOMS_Rejected                   string = "Rejected"                   // Order has been rejected by the market)
+	TOMS_PendingSendToMarket        TradeOrderMarketStatus = "PendingSendToMarket"        // Order is to be sent to the market
+	TOMS_SentToMarket               TradeOrderMarketStatus = "SentToMarket"               // Order has been sent to the market
+	TOMS_InOrderBook                TradeOrderMarketStatus = "InOrderBook"                // Order has been received by the market, and placed into the order-book
+	TOMS_Completed                  TradeOrderMarketStatus = "Completed"                  // Order has been completely executed, and removed from the order-book
+	TOMS_PendingCancellationRequest TradeOrderMarketStatus = "PendingCancellationRequest" // Cancellation request is to be sent to the market
+	TOMS_CancellationRequested      TradeOrderMarketStatus = "CancellationRequested"      // Cancellation request has been sent to the market
+	TOMS_Cancelled                  TradeOrderMarketStatus = "Cancelled"                  // Order has been cancelled in the market, and removed from the order-book - though may still have been partially executed
+	TOMS_Rejected                   TradeOrderMarketStatus = "Rejected"                   // Order has been rejected by the market)
 )
 
 type TradeOrder struct {
