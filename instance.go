@@ -33,24 +33,21 @@ var ErrServerError = errors.New("server error (5xx)")
 
 //	Deal Count
 //	http://docs.yacuna.com/api/#api-Deal-Deal_count
-func (r *Instance) GetDealCount(req *DealCountRequest) (*DealCountResponse, error) {
+func (r *Instance) GetDealCount(req *DealCountRequest) (*CountResponse, error) {
 
 	uriPath := "deal/count"
-	respObj := &DealCountResponse{}
+	respObj := &CountResponse{}
 	res := r.api.Res(uriPath, respObj)
 
 	r.setAuthentication(res, uriPath)
 	re, err := doGet(res, req)
-	if err != nil {
-		return nil, err
-	}
 
-	ret, ok := re.Response.(DealCountResponse)
+	ret, ok := re.Response.(*CountResponse)
 	if !ok {
 		return nil, ErrUnexpectedType
 	}
 
-	return &ret, nil
+	return ret, err
 
 }
 
@@ -64,16 +61,13 @@ func (r *Instance) GetDeal(dealId string) (*GetDealResponse, error) {
 
 	r.setAuthentication(res, uriPath)
 	re, err := doGet(res)
-	if err != nil {
-		return nil, err
-	}
 
-	ret, ok := re.Response.(GetDealResponse)
+	ret, ok := re.Response.(*GetDealResponse)
 	if !ok {
 		return nil, ErrUnexpectedType
 	}
 
-	return &ret, nil
+	return ret, err
 
 }
 
@@ -87,18 +81,282 @@ func (r *Instance) GetDealList(req *DealListRequest) (*DealListResponse, error) 
 
 	r.setAuthentication(res, uriPath)
 	re, err := doGet(res, req)
-	if err != nil {
-		return nil, err
-	}
 
-	ret, ok := re.Response.(DealListResponse)
+	ret, ok := re.Response.(*DealListResponse)
 	if !ok {
 		return nil, ErrUnexpectedType
 	}
 
-	return &ret, nil
+	return ret, err
 
 }
+
+
+//	Market Count
+//	http://docs.yacuna.com/api/#api-Market-Market_count
+func (r *Instance) GetMarketCount(req *MarketCountRequest) (*CountResponse, error) {
+
+	uriPath := "market/count"
+	respObj := &CountResponse{}
+	res := r.api.Res(uriPath, respObj)
+
+	r.setAuthentication(res, uriPath)
+	re, err := doGet(res, req)
+
+	ret, ok := re.Response.(*CountResponse)
+	if !ok {
+		return nil, ErrUnexpectedType
+	}
+
+	return ret, err
+
+}
+
+//	Market List
+//	http://docs.yacuna.com/api/#api-Market-Market_list
+func (r *Instance) GetMarketList(req *MarketListRequest) (*MarketListResponse, error) {
+
+	uriPath := "market/list"
+	respObj := &MarketListResponse{}
+	res := r.api.Res(uriPath, respObj)
+
+	r.setAuthentication(res, uriPath)
+	re, err := doGet(res, req)
+
+	ret, ok := re.Response.(*MarketListResponse)
+	if !ok {
+		return nil, ErrUnexpectedType
+	}
+
+	return ret, err
+
+}
+
+
+// Get MarketDepth
+// http://docs.yacuna.com/api/#api-Market-MarketDepth_get
+func (r *Instance) GetMarketDepth(currency1 string, currency2 string) (*GetMarketDepthResponse, error) {
+
+	uriPath := fmt.Sprintf("marketdepth/get/%s/%s", currency1, currency2)
+	respObj := &GetMarketDepthResponse{}
+	res := r.api.Res(uriPath, respObj)
+
+	r.setAuthentication(res, uriPath)
+	re, err := doGet(res)
+
+	ret, ok := re.Response.(*GetMarketDepthResponse)
+	if !ok {
+		return nil, ErrUnexpectedType
+	}
+
+	return ret, err
+
+}
+
+// Get OrderBook
+// http://docs.yacuna.com/api/#api-Market-OrderBook_get
+func (r *Instance) GetOrderBook(currency1 string, currency2 string) (*GetOrderBookResponse, error) {
+
+	uriPath := fmt.Sprintf("orderbook/get/%s/%s", currency1, currency2)
+	respObj := &GetOrderBookResponse{}
+	res := r.api.Res(uriPath, respObj)
+
+	r.setAuthentication(res, uriPath)
+	re, err := doGet(res)
+
+	ret, ok := re.Response.(*GetOrderBookResponse)
+	if !ok {
+		return nil, ErrUnexpectedType
+	}
+
+	return ret, err
+
+}
+
+// Cancel Order
+// http://docs.yacuna.com/api/#api-Order-Order_cancel
+func (r *Instance) CancelOrder(orderId string) (*OrderResponse, error) {
+
+	uriPath := "order/cancel/" + orderId
+	respObj := &OrderResponse{}
+	res := r.api.Res(uriPath, respObj)
+
+	r.setAuthentication(res, uriPath)
+	re, err := doPost(res)
+
+	ret, ok := re.Response.(*OrderResponse)
+	if !ok {
+		return nil, ErrUnexpectedType
+	}
+
+	return ret, err
+
+}
+
+// Confirm Order
+// http://docs.yacuna.com/api/#api-Order-Order_confirm
+func (r *Instance) ConfirmOrder(orderId string) (*OrderResponse, error) {
+
+	uriPath := "order/confirm/" + orderId
+	respObj := &OrderResponse{}
+	res := r.api.Res(uriPath, respObj)
+
+	r.setAuthentication(res, uriPath)
+	re, err := doPost(res)
+
+	ret, ok := re.Response.(*OrderResponse)
+	if !ok {
+		return nil, ErrUnexpectedType
+	}
+
+	return ret, err
+
+}
+
+//	Order Count
+//	http://docs.yacuna.com/api/#api-Order-Order_count
+func (r *Instance) GetOrderCount(req *OrderCountRequest) (*CountResponse, error) {
+
+	uriPath := "order/count"
+	respObj := &CountResponse{}
+	res := r.api.Res(uriPath, respObj)
+
+	r.setAuthentication(res, uriPath)
+	re, err := doGet(res, req)
+
+	ret, ok := re.Response.(*CountResponse)
+	if !ok {
+		return nil, ErrUnexpectedType
+	}
+
+	return ret, err
+
+}
+
+// Create Order
+// http://docs.yacuna.com/api/#api-Order-Order_create
+func (r *Instance) CreateOrder(currency1 string, currency2 string, req *CreateOrderRequest) (*OrderResponse, error) {
+
+	uriPath := fmt.Sprintf("order/create/%s/%s", currency1, currency2)
+	respObj := &OrderResponse{}
+	res := r.api.Res(uriPath, respObj)
+
+	r.setAuthentication(res, uriPath)
+	re, err := doPost(res, req)
+
+	ret, ok := re.Response.(*OrderResponse)
+	if !ok {
+		return nil, ErrUnexpectedType
+	}
+
+	return ret, err
+
+}
+
+// Get Order
+// http://docs.yacuna.com/api/#api-Order-Order_Get
+func (r *Instance) GetOrder(orderId string) (*OrderResponse, error) {
+
+	uriPath := "order/get/" + orderId
+	respObj := &OrderResponse{}
+	res := r.api.Res(uriPath, respObj)
+
+	r.setAuthentication(res, uriPath)
+	re, err := doGet(res)
+
+	ret, ok := re.Response.(*OrderResponse)
+	if !ok {
+		return nil, ErrUnexpectedType
+	}
+
+	return ret, err
+
+}
+
+// Get Order by ext ref id
+// http://docs.yacuna.com/api/#api-Order-Order_get_by_external_reference_Id
+func (r *Instance) GetOrderByExtRefId(walletAccountId string, externalReferenceId string) (*OrderResponse, error) {
+
+	uriPath := "order/getByExternalReferenceId/" + walletAccountId
+	respObj := &OrderResponse{}
+	res := r.api.Res(uriPath, respObj)
+
+	req := &OrderByExtRefIdRequest{externalReferenceId, walletAccountId}
+
+	r.setAuthentication(res, uriPath)
+	re, err := doGet(res, req)
+
+	ret, ok := re.Response.(*OrderResponse)
+	if !ok {
+		return nil, ErrUnexpectedType
+	}
+
+	return ret, err
+
+}
+
+
+//	Order List
+//	http://docs.yacuna.com/api/#api-Order-Order_list
+func (r *Instance) GetOrderList(req *OrderListRequest) (*OrderListResponse, error) {
+
+	uriPath := "order/list"
+	respObj := &OrderListResponse{}
+	res := r.api.Res(uriPath, respObj)
+
+	r.setAuthentication(res, uriPath)
+	re, err := doGet(res, req)
+
+	ret, ok := re.Response.(*OrderListResponse)
+	if !ok {
+		return nil, ErrUnexpectedType
+	}
+
+	return ret, err
+
+}
+
+
+// Get OrderBook Chart
+// http://docs.yacuna.com/api/#api-Public_Charts-Orderbook
+func (r *Instance) GetOrderBookChart(currency1 string, currency2 string) (*OrderBookChart, error) {
+
+	uriPath := fmt.Sprintf("charts/orderbook/%s/%s", currency1, currency2)
+	respObj := &OrderBookChart{}
+	res := r.api.Res(uriPath, respObj)
+
+	r.setAuthentication(res, uriPath)
+	re, err := doGet(res)
+
+	ret, ok := re.Response.(*OrderBookChart)
+	if !ok {
+		return nil, ErrUnexpectedType
+	}
+
+	return ret, err
+
+}
+
+// Get Trades Chart
+// http://docs.yacuna.com/api/#api-Public_Charts-Trades
+func (r *Instance) GetTradesChart(currency1 string, currency2 string, since int) (*TradesChart, error) {
+
+	uriPath := fmt.Sprintf("charts/trades/%s/%s/?since=%d", currency1, currency2, since)
+	respObj := &TradesChart{}
+	res := r.api.Res(uriPath, respObj)
+
+	r.setAuthentication(res, uriPath)
+	re, err := doGet(res)
+
+	ret, ok := re.Response.(*TradesChart)
+	if !ok {
+		return nil, ErrUnexpectedType
+	}
+
+	return ret, err
+
+}
+
 
 //	Get Wallet
 //	http://docs.yacuna.com/api/#api-Wallet-Wallet_get
@@ -110,16 +368,13 @@ func (r *Instance) GetWallet(req *GetWalletRequest) (*GetWalletResponse, error) 
 
 	r.setAuthentication(res, uriPath)
 	re, err := doGet(res, req)
-	if err != nil {
-		return nil, err
-	}
 
 	ret, ok := re.Response.(*GetWalletResponse)
 	if !ok {
 		return nil, ErrUnexpectedType
 	}
 
-	return ret, nil
+	return ret, err
 
 }
 
@@ -139,7 +394,32 @@ func doGet(res *gopencils.Resource, req ...interface{}) (*gopencils.Resource, er
 
 
 	if re.Raw.StatusCode >= 500 {
-		return nil, ErrServerError
+		return re, ErrServerError
+	}
+	if re.Raw.StatusCode >= 400 {
+		return re, ErrClientError
+	}
+
+	return re, err
+}
+
+func doPost(res *gopencils.Resource, req ...interface{}) (*gopencils.Resource, error) {
+
+	var re *gopencils.Resource
+	var err error
+	if len(req) > 0 {
+		re, err = res.Post(*toStringMap(req[0]))
+	} else {
+		re, err = res.Post()
+	}
+
+	if err != nil {
+		return nil, err
+	}
+
+
+	if re.Raw.StatusCode >= 500 {
+		return re, ErrServerError
 	}
 	if re.Raw.StatusCode >= 400 {
 		return re, ErrClientError
