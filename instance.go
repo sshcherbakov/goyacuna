@@ -7,10 +7,6 @@ import (
 	"errors"
 )
 
-const (
-	API_PATH="/api/1"
-)
-
 type Instance struct {
 	id string
 	secret string
@@ -433,7 +429,7 @@ func (r *Instance) setAuthentication(res *gopencils.Resource, uriPath string) {
 	ti := &apiTokenInput{
 		secret: r.secret,
 		method: "GET",
-		path: 	API_PATH + "/" + uriPath,
+		path: 	r.api.Api.BaseUrl.Path + "/" + uriPath,
 		query: 	r.api.QueryValues.Encode(),
 	}
 

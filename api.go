@@ -6,9 +6,15 @@ import (
 	"github.com/bndr/gopencils"
 )
 
+type Config struct {
+	Url		string
+	Id		string
+	Secret	string
+}
+
 // Create a new API Instance and returns a Resource
 // Accepts URL as parameter, and HTTP Client.
-func Api(baseUrl string) *Instance {
+func Api(config *Config) *Instance {
 
 	// Skip verify by default?
 	tr := &http.Transport{
@@ -19,6 +25,10 @@ func Api(baseUrl string) *Instance {
 		Transport: tr,
 	}
 
-	return &Instance{ api: gopencils.Api(baseUrl, client) }
+	inst := Instance{ api: gopencils.Api(config.Url, client) }
+	inst.SetId(config.Id)
+	inst.SetSecret(config.Secret)
+
+	return &inst
 
 }
