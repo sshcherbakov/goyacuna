@@ -1,6 +1,7 @@
 package goyacuna
 
 import (
+	"strconv"
 	"fmt"
 	"github.com/bndr/gopencils"
 	"github.com/fatih/structs"
@@ -337,11 +338,12 @@ func (r *Instance) GetOrderBookChart(currency1 string, currency2 string) (*Order
 // http://docs.yacuna.com/api/#api-Public_Charts-Trades
 func (r *Instance) GetTradesChart(currency1 string, currency2 string, since int) (*TradesChart, error) {
 
-	uriPath := fmt.Sprintf("charts/trades/%s/%s/?since=%d", currency1, currency2, since)
+	uriPath := fmt.Sprintf("charts/trades/%s/%s/", currency1, currency2)
 	respObj := &TradesChart{}
-	res := r.api.Res(uriPath, respObj)
 
-	r.setAuthentication(res, uriPath)
+	query := map[string]string{"since": strconv.Itoa(since)}
+	res := r.api.Res(uriPath, respObj).SetQuery(query)
+
 	re, err := doGet(res)
 
 	ret, ok := re.Response.(*TradesChart)
