@@ -37,6 +37,8 @@ func ApiToken(input *apiTokenInput) string {
 		hashInput += "@" + input.body
 	}
 
+	fmt.Println(hashInput)
+
 	hashValue := sha512.Sum512([]byte(hashInput))
 	return salt + "T" + hex.EncodeToString( hashValue[:] )
 

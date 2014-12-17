@@ -6,6 +6,7 @@ import (
 	"github.com/bndr/gopencils"
 	"github.com/fatih/structs"
 	"errors"
+	"time"
 )
 
 type Instance struct {
@@ -36,8 +37,10 @@ func (r *Instance) GetDealCount(req *DealCountRequest) (*CountResponse, error) {
 	respObj := &CountResponse{}
 	res := r.api.Res(uriPath, respObj)
 
+	res.SetQuery(*toStringMap(req))
 	r.setAuthentication(res, uriPath)
-	re, err := doGet(res, req)
+	//re, err := doGet(res, req)
+	re, err := doGet(res)
 
 	ret, ok := re.Response.(*CountResponse)
 	if !ok {
@@ -76,8 +79,9 @@ func (r *Instance) GetDealList(req *DealListRequest) (*DealListResponse, error) 
 	respObj := &DealListResponse{}
 	res := r.api.Res(uriPath, respObj)
 
+	res.SetQuery(*toStringMap(req))
 	r.setAuthentication(res, uriPath)
-	re, err := doGet(res, req)
+	re, err := doGet(res)
 
 	ret, ok := re.Response.(*DealListResponse)
 	if !ok {
@@ -97,8 +101,9 @@ func (r *Instance) GetMarketCount(req *MarketCountRequest) (*CountResponse, erro
 	respObj := &CountResponse{}
 	res := r.api.Res(uriPath, respObj)
 
+	res.SetQuery(*toStringMap(req))
 	r.setAuthentication(res, uriPath)
-	re, err := doGet(res, req)
+	re, err := doGet(res)
 
 	ret, ok := re.Response.(*CountResponse)
 	if !ok {
@@ -117,8 +122,8 @@ func (r *Instance) GetMarketList(req *MarketListRequest) (*MarketListResponse, e
 	respObj := &MarketListResponse{}
 	res := r.api.Res(uriPath, respObj)
 
-	r.setAuthentication(res, uriPath)
-	re, err := doGet(res, req)
+	res.SetQuery(*toStringMap(req))
+	re, err := doGet(res)
 
 	ret, ok := re.Response.(*MarketListResponse)
 	if !ok {
@@ -218,8 +223,9 @@ func (r *Instance) GetOrderCount(req *OrderCountRequest) (*CountResponse, error)
 	respObj := &CountResponse{}
 	res := r.api.Res(uriPath, respObj)
 
+	res.SetQuery(*toStringMap(req))
 	r.setAuthentication(res, uriPath)
-	re, err := doGet(res, req)
+	re, err := doGet(res)
 
 	ret, ok := re.Response.(*CountResponse)
 	if !ok {
@@ -238,8 +244,9 @@ func (r *Instance) CreateOrder(currency1 string, currency2 string, req *CreateOr
 	respObj := &OrderResponse{}
 	res := r.api.Res(uriPath, respObj)
 
+	res.SetPayload(*toStringMap(req))
 	r.setAuthentication(res, uriPath)
-	re, err := doPost(res, req)
+	re, err := doPost(res)
 
 	ret, ok := re.Response.(*OrderResponse)
 	if !ok {
@@ -280,8 +287,9 @@ func (r *Instance) GetOrderByExtRefId(walletAccountId string, externalReferenceI
 
 	req := &OrderByExtRefIdRequest{externalReferenceId, walletAccountId}
 
+	res.SetQuery(*toStringMap(req))
 	r.setAuthentication(res, uriPath)
-	re, err := doGet(res, req)
+	re, err := doGet(res)
 
 	ret, ok := re.Response.(*OrderResponse)
 	if !ok {
@@ -301,8 +309,9 @@ func (r *Instance) GetOrderList(req *OrderListRequest) (*OrderListResponse, erro
 	respObj := &OrderListResponse{}
 	res := r.api.Res(uriPath, respObj)
 
+	res.SetQuery(*toStringMap(req))
 	r.setAuthentication(res, uriPath)
-	re, err := doGet(res, req)
+	re, err := doGet(res)
 
 	ret, ok := re.Response.(*OrderListResponse)
 	if !ok {
@@ -364,8 +373,9 @@ func (r *Instance) GetWallet(req *GetWalletRequest) (*GetWalletResponse, error) 
 	respObj := &GetWalletResponse{}
 	res := r.api.Res(uriPath, respObj)
 
+	res.SetQuery(*toStringMap(req))
 	r.setAuthentication(res, uriPath)
-	re, err := doGet(res, req)
+	re, err := doGet(res)
 
 	ret, ok := re.Response.(*GetWalletResponse)
 	if !ok {
@@ -376,51 +386,26 @@ func (r *Instance) GetWallet(req *GetWalletRequest) (*GetWalletResponse, error) 
 
 }
 
-func doGet(res *gopencils.Resource, req ...interface{}) (*gopencils.Resource, error) {
-
-	var re *gopencils.Resource
-	var err error
-	if len(req) > 0 {
-		re, err = res.Get(*toStringMap(req[0]))
-	} else {
-		re, err = res.Get()
-	}
-
-	if err != nil {
-		return nil, err
-	}
-
-
-	if re.Raw.StatusCode >= 500 {
-		return re, ErrServerError
-	}
-	if re.Raw.StatusCode >= 400 {
-		return re, ErrClientError
-	}
-
-	return re, err
+func doGet(res *gopencils.Resource) (*gopencils.Resource, error) {
+	re, err := res.Get()
+	return checkRequestResult(re, err)
 }
 
-func doPost(res *gopencils.Resource, req ...interface{}) (*gopencils.Resource, error) {
+func doPost(res *gopencils.Resource) (*gopencils.Resource, error) {
+	re, err := res.Post()
+	return checkRequestResult(re, err)
+}
 
-	var re *gopencils.Resource
-	var err error
-	if len(req) > 0 {
-		re, err = res.Post(*toStringMap(req[0]))
-	} else {
-		re, err = res.Post()
-	}
-
+func checkRequestResult(re *gopencils.Resource, err error) (*gopencils.Resource, error) {
 	if err != nil {
 		return nil, err
 	}
 
-
 	if re.Raw.StatusCode >= 500 {
-		return re, ErrServerError
+		return re, errors.New("server error " + strconv.Itoa(re.Raw.StatusCode))
 	}
 	if re.Raw.StatusCode >= 400 {
-		return re, ErrClientError
+		return re, errors.New("client error " + strconv.Itoa(re.Raw.StatusCode))
 	}
 
 	return re, err
@@ -431,8 +416,8 @@ func (r *Instance) setAuthentication(res *gopencils.Resource, uriPath string) {
 	ti := &apiTokenInput{
 		secret: r.secret,
 		method: "GET",
-		path: 	r.api.Api.BaseUrl.Path + "/" + uriPath,
-		query: 	r.api.QueryValues.Encode(),
+		path: 	res.Api.BaseUrl.Path + "/" + uriPath,
+		query: 	res.QueryValues.Encode(),
 	}
 
 	res.SetHeader(H_ApiTokenId, r.id)
@@ -443,13 +428,27 @@ func (r *Instance) setAuthentication(res *gopencils.Resource, uriPath string) {
 
 func toStringMap(req interface{}) *map[string]string {
 
-	rm := map[string]string{}
+	rm := &map[string]string{}
 	for key, value := range structs.Map(req) {
-		strVal := fmt.Sprintf("%v", value)
-		if strVal != "" {
-			rm[key] = strVal
-		}
+		formatVal(key, value, rm)
 	}
 
-	return &rm
+	return rm
 }
+
+func formatVal(key string, value interface{}, rm *map[string]string) {
+	strVal := ""
+	switch t := value.(type) {
+	default:
+		strVal = fmt.Sprintf("%v", t)
+	case time.Time:
+		strVal = t.Format(time.RFC3339)
+	case map[string]interface{}:
+		for key2, value2 := range t {
+			formatVal(key2, value2, rm)
+		}
+		return
+	}
+	(*rm)[key] = strVal
+}
+

@@ -1,3 +1,22 @@
+Goyacuna - Golang Yacuna REST API wrapper
+=========================================
+
+Summary
+-------
+
+Goyacuna is a Golang wrapper for the [Yacuna](https://yacuna.com/) European Bitcoin Exchange REST API.
+It provides convenient way of interacting with the Exchange, consuming its services and trade Bitcoin,
+Litecoin, Dogecoin and other crypto-currencies.
+
+Installation
+------------
+````
+go get github.com/sshcherbakov/goyacuna
+````
+
+Usage
+-----
+```go
 package main
 
 import (
@@ -104,3 +123,18 @@ func readConfig(fileName string) *goyacuna.Config {
 
 	return &config
 }
+```
+
+Contribute
+----------
+All Contributions are welcome. Feel free to send a pull request.
+
+
+License
+-------
+Apache License 2.0
+
+
+
+
+
