@@ -1,5 +1,6 @@
 Goyacuna - Golang Yacuna REST API wrapper
 =========================================
+[![Build Status](https://travis-ci.org/sshcherbakov/goyacuna.svg?branch=master)](https://travis-ci.org/sshcherbakov/goyacuna)
 
 Summary
 -------
