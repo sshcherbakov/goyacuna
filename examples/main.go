@@ -66,7 +66,7 @@ func main() {
 	res12, err := api.GetOrder(res9.TradeOrder.Id)
 	printCallResult("GetOrder: ", res12, err )
 
-	res13, err := api.GetOrderByExtRefId(waid, res9.TradeOrder.ExternalReferenceId)
+	res13, err := api.GetOrderByExtRefId(waid, "XXX")
 	printCallResult("GetOrderByExtRefId: ", res13, err )
 
 	res14, err := api.GetOrderList(&goyacuna.OrderListRequest{OrderCountRequest:goyacuna.OrderCountRequest{WalletAccountId: waid}})
