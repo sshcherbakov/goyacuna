@@ -16,6 +16,7 @@ func main() {
 
 	api := goyacuna.Api(config)
 
+
 	res1, err := api.GetWallet(&goyacuna.GetWalletRequest{})
 	printCallResult("GetWallet: ", res1, err )
 
@@ -24,12 +25,12 @@ func main() {
 		return
 	}
 
-	waid := res1.Wallet.Accounts[0].WalletAccountId
+	waid := res1.WalletIdByCurrency("XBT")
 
 	res2, err := api.GetDealCount(&goyacuna.DealCountRequest{WalletAccountId: waid})
 	printCallResult("GetDealCount: ", res2, err )
 
-	res3, err := api.GetDeal("AAEABGOj1rR4C7xxreNhYNjXItSH_Yp93aYNuhH2GuaNiE4UjkoRolFm")
+	res3, err := api.GetDeal("XXXX")
 	printCallResult("GetDeal: ", res3, err )
 
 	res4, err := api.GetDealList(&goyacuna.DealListRequest{DealCountRequest:goyacuna.DealCountRequest{WalletAccountId: waid}})
@@ -48,7 +49,12 @@ func main() {
 	printCallResult("GetOrderBook: ", res8, err )
 
 	res9, err := api.CreateOrder("XBT", "EUR",
-		&goyacuna.CreateOrderRequest{ WalletAccountId: "xxx", TradeOrderType: goyacuna.TOT_BuyLimit })
+		&goyacuna.CreateOrderRequest{
+			WalletAccountId: waid,
+			TradeOrderType: goyacuna.TOT_SellMarket,
+			SellAmount: 0.001,
+			SellCurrency: "XBT",
+	})
 	printCallResult("CreateOrder: ", res9, err )
 
 	res10, err := api.ConfirmOrder(res9.TradeOrder.Id)
@@ -60,7 +66,7 @@ func main() {
 	res12, err := api.GetOrder(res9.TradeOrder.Id)
 	printCallResult("GetOrder: ", res12, err )
 
-	res13, err := api.GetOrderByExtRefId(waid, "")
+	res13, err := api.GetOrderByExtRefId(waid, res9.TradeOrder.ExternalReferenceId)
 	printCallResult("GetOrderByExtRefId: ", res13, err )
 
 	res14, err := api.GetOrderList(&goyacuna.OrderListRequest{OrderCountRequest:goyacuna.OrderCountRequest{WalletAccountId: waid}})

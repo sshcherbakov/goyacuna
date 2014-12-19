@@ -7,6 +7,8 @@ import (
 	"github.com/fatih/structs"
 	"errors"
 	"time"
+	"bytes"
+	"net/url"
 )
 
 type Instance struct {
@@ -38,8 +40,7 @@ func (r *Instance) GetDealCount(req *DealCountRequest) (*CountResponse, error) {
 	res := r.api.Res(uriPath, respObj)
 
 	res.SetQuery(*toStringMap(req))
-	r.setAuthentication(res, uriPath)
-	//re, err := doGet(res, req)
+	r.setGetAuthentication(res, uriPath)
 	re, err := doGet(res)
 
 	ret, ok := re.Response.(*CountResponse)
@@ -59,7 +60,7 @@ func (r *Instance) GetDeal(dealId string) (*GetDealResponse, error) {
 	respObj := &GetDealResponse{}
 	res := r.api.Res(uriPath, respObj)
 
-	r.setAuthentication(res, uriPath)
+	r.setGetAuthentication(res, uriPath)
 	re, err := doGet(res)
 
 	ret, ok := re.Response.(*GetDealResponse)
@@ -80,7 +81,7 @@ func (r *Instance) GetDealList(req *DealListRequest) (*DealListResponse, error) 
 	res := r.api.Res(uriPath, respObj)
 
 	res.SetQuery(*toStringMap(req))
-	r.setAuthentication(res, uriPath)
+	r.setGetAuthentication(res, uriPath)
 	re, err := doGet(res)
 
 	ret, ok := re.Response.(*DealListResponse)
@@ -102,7 +103,7 @@ func (r *Instance) GetMarketCount(req *MarketCountRequest) (*CountResponse, erro
 	res := r.api.Res(uriPath, respObj)
 
 	res.SetQuery(*toStringMap(req))
-	r.setAuthentication(res, uriPath)
+	r.setGetAuthentication(res, uriPath)
 	re, err := doGet(res)
 
 	ret, ok := re.Response.(*CountResponse)
@@ -123,6 +124,8 @@ func (r *Instance) GetMarketList(req *MarketListRequest) (*MarketListResponse, e
 	res := r.api.Res(uriPath, respObj)
 
 	res.SetQuery(*toStringMap(req))
+	r.setGetAuthentication(res, uriPath)
+
 	re, err := doGet(res)
 
 	ret, ok := re.Response.(*MarketListResponse)
@@ -143,7 +146,7 @@ func (r *Instance) GetMarketDepth(currency1 string, currency2 string) (*GetMarke
 	respObj := &GetMarketDepthResponse{}
 	res := r.api.Res(uriPath, respObj)
 
-	r.setAuthentication(res, uriPath)
+	r.setGetAuthentication(res, uriPath)
 	re, err := doGet(res)
 
 	ret, ok := re.Response.(*GetMarketDepthResponse)
@@ -163,7 +166,7 @@ func (r *Instance) GetOrderBook(currency1 string, currency2 string) (*GetOrderBo
 	respObj := &GetOrderBookResponse{}
 	res := r.api.Res(uriPath, respObj)
 
-	r.setAuthentication(res, uriPath)
+	r.setGetAuthentication(res, uriPath)
 	re, err := doGet(res)
 
 	ret, ok := re.Response.(*GetOrderBookResponse)
@@ -183,7 +186,7 @@ func (r *Instance) CancelOrder(orderId string) (*OrderResponse, error) {
 	respObj := &OrderResponse{}
 	res := r.api.Res(uriPath, respObj)
 
-	r.setAuthentication(res, uriPath)
+	r.setPostAuthentication(res, uriPath)
 	re, err := doPost(res)
 
 	ret, ok := re.Response.(*OrderResponse)
@@ -203,7 +206,7 @@ func (r *Instance) ConfirmOrder(orderId string) (*OrderResponse, error) {
 	respObj := &OrderResponse{}
 	res := r.api.Res(uriPath, respObj)
 
-	r.setAuthentication(res, uriPath)
+	r.setPostAuthentication(res, uriPath)
 	re, err := doPost(res)
 
 	ret, ok := re.Response.(*OrderResponse)
@@ -224,7 +227,7 @@ func (r *Instance) GetOrderCount(req *OrderCountRequest) (*CountResponse, error)
 	res := r.api.Res(uriPath, respObj)
 
 	res.SetQuery(*toStringMap(req))
-	r.setAuthentication(res, uriPath)
+	r.setGetAuthentication(res, uriPath)
 	re, err := doGet(res)
 
 	ret, ok := re.Response.(*CountResponse)
@@ -244,9 +247,9 @@ func (r *Instance) CreateOrder(currency1 string, currency2 string, req *CreateOr
 	respObj := &OrderResponse{}
 	res := r.api.Res(uriPath, respObj)
 
-	res.SetPayload(*toStringMap(req))
-	r.setAuthentication(res, uriPath)
-	re, err := doPost(res)
+	payload := toPayload(toStringMap(req))
+	r.setPostAuthentication(res, uriPath, payload)
+	re, err := doPost(res, payload)
 
 	ret, ok := re.Response.(*OrderResponse)
 	if !ok {
@@ -265,7 +268,7 @@ func (r *Instance) GetOrder(orderId string) (*OrderResponse, error) {
 	respObj := &OrderResponse{}
 	res := r.api.Res(uriPath, respObj)
 
-	r.setAuthentication(res, uriPath)
+	r.setGetAuthentication(res, uriPath)
 	re, err := doGet(res)
 
 	ret, ok := re.Response.(*OrderResponse)
@@ -288,7 +291,7 @@ func (r *Instance) GetOrderByExtRefId(walletAccountId string, externalReferenceI
 	req := &OrderByExtRefIdRequest{externalReferenceId, walletAccountId}
 
 	res.SetQuery(*toStringMap(req))
-	r.setAuthentication(res, uriPath)
+	r.setGetAuthentication(res, uriPath)
 	re, err := doGet(res)
 
 	ret, ok := re.Response.(*OrderResponse)
@@ -310,7 +313,7 @@ func (r *Instance) GetOrderList(req *OrderListRequest) (*OrderListResponse, erro
 	res := r.api.Res(uriPath, respObj)
 
 	res.SetQuery(*toStringMap(req))
-	r.setAuthentication(res, uriPath)
+	r.setGetAuthentication(res, uriPath)
 	re, err := doGet(res)
 
 	ret, ok := re.Response.(*OrderListResponse)
@@ -331,7 +334,7 @@ func (r *Instance) GetOrderBookChart(currency1 string, currency2 string) (*Order
 	respObj := &OrderBookChart{}
 	res := r.api.Res(uriPath, respObj)
 
-	r.setAuthentication(res, uriPath)
+	r.setGetAuthentication(res, uriPath)
 	re, err := doGet(res)
 
 	ret, ok := re.Response.(*OrderBookChart)
@@ -347,11 +350,13 @@ func (r *Instance) GetOrderBookChart(currency1 string, currency2 string) (*Order
 // http://docs.yacuna.com/api/#api-Public_Charts-Trades
 func (r *Instance) GetTradesChart(currency1 string, currency2 string, since int) (*TradesChart, error) {
 
-	uriPath := fmt.Sprintf("charts/trades/%s/%s/", currency1, currency2)
+	uriPath := fmt.Sprintf("charts/trades/%s/%s", currency1, currency2)
 	respObj := &TradesChart{}
 
 	query := map[string]string{"since": strconv.Itoa(since)}
-	res := r.api.Res(uriPath, respObj).SetQuery(query)
+	res := r.api.Res(uriPath, respObj)
+	res.SetQuery(query)
+	r.setGetAuthentication(res, uriPath)
 
 	re, err := doGet(res)
 
@@ -374,7 +379,7 @@ func (r *Instance) GetWallet(req *GetWalletRequest) (*GetWalletResponse, error) 
 	res := r.api.Res(uriPath, respObj)
 
 	res.SetQuery(*toStringMap(req))
-	r.setAuthentication(res, uriPath)
+	r.setGetAuthentication(res, uriPath)
 	re, err := doGet(res)
 
 	ret, ok := re.Response.(*GetWalletResponse)
@@ -391,14 +396,26 @@ func doGet(res *gopencils.Resource) (*gopencils.Resource, error) {
 	return checkRequestResult(re, err)
 }
 
-func doPost(res *gopencils.Resource) (*gopencils.Resource, error) {
+func toPayload(payload *map[string]string) string {
+	vals := make(url.Values)
+	for k, v := range *payload {
+		vals.Set(k, v)
+	}
+	return vals.Encode()
+}
+
+func doPost(res *gopencils.Resource, payload ...string) (*gopencils.Resource, error) {
+	if len(payload) > 0 {
+		res.SetHeader("Content-Type", "application/x-www-form-urlencoded")
+		res.Payload = bytes.NewBuffer([]byte(payload[0]))
+	}
 	re, err := res.Post()
 	return checkRequestResult(re, err)
 }
 
 func checkRequestResult(re *gopencils.Resource, err error) (*gopencils.Resource, error) {
 	if err != nil {
-		return nil, err
+		return re, err
 	}
 
 	if re.Raw.StatusCode >= 500 {
@@ -411,7 +428,7 @@ func checkRequestResult(re *gopencils.Resource, err error) (*gopencils.Resource,
 	return re, err
 }
 
-func (r *Instance) setAuthentication(res *gopencils.Resource, uriPath string) {
+func (r *Instance) setGetAuthentication(res *gopencils.Resource, uriPath string) {
 
 	ti := &apiTokenInput{
 		secret: r.secret,
@@ -420,10 +437,29 @@ func (r *Instance) setAuthentication(res *gopencils.Resource, uriPath string) {
 		query: 	res.QueryValues.Encode(),
 	}
 
-	res.SetHeader(H_ApiTokenId, r.id)
+	setAuthentication(res, r.id, ti)
+}
+
+func (r *Instance) setPostAuthentication(res *gopencils.Resource, uriPath string, payload ...string) {
+
+	ti := &apiTokenInput{
+		secret: r.secret,
+		method: "POST",
+		path: 	res.Api.BaseUrl.Path + "/" + uriPath,
+		query: 	res.QueryValues.Encode(),
+	}
+
+	if len(payload) > 0 {
+		ti.body = payload[0]
+	}
+
+	setAuthentication(res, r.id, ti)
+}
+
+func setAuthentication(res *gopencils.Resource, id string, ti *apiTokenInput) {
+	res.SetHeader(H_ApiTokenId, id)
 	res.SetHeader(H_ApiToken, ApiToken( ti ) )
 	res.SetHeader(H_ApiTokenOTP, "")
-
 }
 
 func toStringMap(req interface{}) *map[string]string {

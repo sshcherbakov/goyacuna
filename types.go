@@ -234,7 +234,7 @@ type TradeOrder struct {
 	TradeOrderStatus       TradeStatus            `json:"tradeOrderStatus" structs:"tradeOrderStatus"`
 	TradeOrderMarketStatus TradeOrderMarketStatus `json:"tradeOrderMarketStatus" structs:"tradeOrderMarketStatus"`
 	PriceLimit             float64                `json:"priceLimit" structs:"priceLimit"`
-	FillRatio              int                    `json:"fillRatio" structs:"fillRatio"`
+	FillRatio              float64                `json:"fillRatio" structs:"fillRatio"`
 	Amount                 Money                  `json:"amount" structs:"amount"`
 	BuyAmount              Money                  `json:"buyAmount" structs:"buyAmount"`
 	TotalAmountSold        Money                  `json:"totalAmountSold" structs:"totalAmountSold"`
@@ -326,6 +326,15 @@ type GetWalletRequest struct {
 type GetWalletResponse struct {
 	Response
 	Wallet Wallet `json:"wallet" structs:"wallet"`
+}
+
+func (r *GetWalletResponse) WalletIdByCurrency(currency string) string {
+	for _, acc := range r.Wallet.Accounts {
+		if acc.Currency == currency {
+			return acc.WalletAccountId
+		}
+	}
+	return ""
 }
 
 type Wallet struct {
