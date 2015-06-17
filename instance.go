@@ -27,8 +27,8 @@ func (r *Instance) SetSecret(secret string) {
 }
 
 var ErrUnexpectedType = errors.New("unexpected type in response")
-var ErrClientError = errors.New("client error (4xx)")
-var ErrServerError = errors.New("server error (5xx)")
+//var ErrClientError = errors.New("client error (4xx)")
+//var ErrServerError = errors.New("server error (5xx)")
 
 
 //	Deal Count
